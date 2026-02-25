@@ -21,7 +21,7 @@ A web-based eCommerce platform built with Django and MariaDB. Users can register
 
 1. Open a terminal and clone the repository, then navigate into the project folder:
     ```
-    git clone https://github.com/your-username/your-repository-name.git
+    git clone https://github.com/AnnelienJanseVanRensburg/django-ecommerce
     cd your-repository-name
     ```
 
