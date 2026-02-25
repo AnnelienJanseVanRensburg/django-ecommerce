@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ store.name }}{% endblock %}
+
+{% block content %}
+    <h2>{{ store.name }}</h2>
+    <p>{{ store.description }}</p>
+
+    <a href="{% url 'edit_store' store.id %}" class="btn">Edit Store</a>
+    <form method="POST" action="{% url 'delete_store' store.id %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete Store</button>
+    </form>
+
+    <h3>Products</h3>
+    <a href="{% url 'add_product' store.id %}" class="btn">+ Add Product</a>
+
+    {% for product in products %}
+        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>
+                <strong>{{ product.name }}</strong> —
+                R{{ product.price }} —
+                Stock: {{ product.stock }}
+            </span>
+            <span>
+                <a href="{% url 'edit_product' product.id %}" class="btn">Edit</a>
+                <form method="POST" action="{% url 'delete_product' product.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </span>
+        </div>
+    {% empty %}
+        <p>No products yet</p>
+    {% endfor %}
+
+    <br>
+    <a href="{% url 'vendor_dashboard' %}" class="btn">Back to Dashboard</a>
+{% endblock %}

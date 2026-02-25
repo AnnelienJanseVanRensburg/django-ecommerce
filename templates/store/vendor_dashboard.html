@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Vendor Dashboard{% endblock %}
+
+{% block content %}
+    <h2>My Dashboard</h2>
+    <a href="{% url 'create_store' %}" class="btn">+ Create New Store</a>
+
+    {% for store in stores %}
+        <div class="card">
+            <a href="{% url 'vendor_store_detail' store.id %}">{{ store.name }}</a>
+        </div>
+    {% empty %}
+        <p>You have no stores yet</p>
+    {% endfor %}
+{% endblock %}

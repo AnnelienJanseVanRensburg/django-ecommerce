@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <h2>{{ product.name }}</h2>
+        <p>{{ product.description }}</p>
+        <p><strong>Price: R{{ product.price }}</strong></p>
+        <p>Stock: {{ product.stock }}</p>
+
+        {% if user.is_authenticated %}
+            {% if product.store.owner != user %}
+                {% if product.stock > 0 %}
+                    <form method="POST" action="{% url 'add_to_cart' product.id %}">
+                        {% csrf_token %}
+                        <label>Quantity</label>
+                        <input
+                            type="number"
+                            name="quantity"
+                            value="1"
+                            min="1"
+                            max="{{ product.stock }}"
+                            style="width:80px;"
+                        >
+                        <button type="submit" class="btn">Add to Cart</button>
+                    </form>
+                {% else %}
+                    <p><em>Out of stock</em></p>
+                {% endif %}
+                <a href="{% url 'leave_review' product.id %}" class="btn">Leave Review</a>
+            {% else %}
+                <p><em>You own this store</em></p>
+            {% endif %}
+        {% endif %}
+
+        <h3>Reviews</h3>
+        {% for review in reviews %}
+            <div class="card">
+                <p>
+                    <strong>{{ review.reviewer.username }}</strong>
+                    — Rating: {{ review.rating }}/5
+                    {% if review.is_verified %}
+                        <em>(Verified Purchase)</em>
+                    {% else %}
+                        <em>(Unverified)</em>
+                    {% endif %}
+                </p>
+                <p>{{ review.comment }}</p>
+            </div>
+        {% empty %}
+            <p>No reviews yet</p>
+        {% endfor %}
+    </div>
+
+    <a href="{% url 'product_list' product.store.id %}" class="btn">Back to Products</a>
+{% endblock %}

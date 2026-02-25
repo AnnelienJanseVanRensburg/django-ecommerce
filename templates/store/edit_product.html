@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Product{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <h2>Edit {{ product.name }}</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <label>Product Name</label>
+            <input type="text" name="name" value="{{ product.name }}" required>
+
+            <label>Description</label>
+            <textarea name="description" rows="4">{{ product.description }}</textarea>
+
+            <label>Price (R)</label>
+            <input type="number" name="price" step="0.01" min="0" value="{{ product.price }}" required>
+
+            <label>Stock Quantity</label>
+            <input type="number" name="stock" min="0" value="{{ product.stock }}" required>
+
+            <button type="submit">Save Changes</button>
+        </form>
+        <a href="{% url 'vendor_dashboard' %}" class="btn">Cancel</a>
+    </div>
+{% endblock %}

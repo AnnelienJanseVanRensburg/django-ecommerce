@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Leave a Review{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <h2>Leave a Review for {{ product.name }}</h2>
+
+        {% if has_purchased %}
+            <p><em>You have purchased this product — your review will be marked as verified</em></p>
+        {% else %}
+            <p><em>You have not purchased this product — your review will be unverified</em></p>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <label>Rating (1-5)</label>
+            <select name="rating">
+                <option value="1">1 - Poor</option>
+                <option value="2">2 - Fair</option>
+                <option value="3">3 - Good</option>
+                <option value="4">4 - Very Good</option>
+                <option value="5" selected>5 - Excellent</option>
+            </select>
+
+            <label>Comment</label>
+            <textarea name="comment" rows="4" required></textarea>
+
+            <button type="submit">Submit Review</button>
+        </form>
+        <a href="{% url 'product_list' product.store.id %}" class="btn">Cancel</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Stores{% endblock %}
+
+{% block content %}
+    <h2>All Stores</h2>
+
+    {% if user.is_authenticated %}
+        {% if user.userprofile.account_type == 'vendor' %}
+            <a href="{% url 'create_store' %}" class="btn">+ Create New Store</a>
+        {% endif %}
+    {% endif %}
+
+    {% for store in stores %}
+        <div class="card">
+            <h3>{{ store.name }}</h3>
+            <p>{{ store.description }}</p>
+            <a href="{% url 'product_list' store.id %}" class="btn">View Products</a>
+        </div>
+    {% empty %}
+        <p>No stores available yet</p>
+    {% endfor %}
+{% endblock %}
