@@ -70,4 +70,29 @@ urlpatterns = [
         views.product_detail,
         name="product_detail",
     ),
+    path(
+        'api/vendors/<int:vendor_id>/stores/',
+        views.api_get_vendor_stores,
+        name='api_get_vendor_stores',
+    ),
+    path(
+        'api/stores/<int:store_id>/products/',
+        views.api_get_store_products,
+        name='api_get_store_products',
+    ),
+    path(
+        'api/stores/create/',
+        views.api_create_store,
+        name='api_create_store',
+    ),
+    path(
+        'api/stores/<int:store_id>/products/add/',
+        views.api_add_product,
+        name='api_add_product',
+    ),
+    path(
+        'api/products/<int:product_id>/reviews/',
+        views.api_get_product_reviews,
+        name='api_get_product_reviews',
+    ),
 ]

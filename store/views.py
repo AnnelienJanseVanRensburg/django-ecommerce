@@ -1,9 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.conf import settings
 from .models import Store, Product, Order, OrderItem, Review
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
+from rest_framework.authentication import BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import StoreSerializer, ProductSerializer, ReviewSerializer
 
 
 def store_list(request):
@@ -36,6 +46,7 @@ def product_detail(request, product_id):
 
 
 @login_required
+@permission_required('store.can_purchase', raise_exception=True)
 def add_to_cart(request, product_id):
     """Add a product to the session cart with a specified quantity."""
     product = get_object_or_404(Product, id=product_id)
@@ -73,6 +84,7 @@ def add_to_cart(request, product_id):
 
 
 @login_required
+@permission_required('store.can_purchase', raise_exception=True)
 def view_cart(request):
     """Display the current session cart with subtotals and total."""
     cart = request.session.get("cart", {})
@@ -100,6 +112,7 @@ def view_cart(request):
 
 
 @login_required
+@permission_required('store.can_purchase', raise_exception=True)
 def remove_from_cart(request, product_id):
     """Remove a product from the session cart."""
     cart = request.session.get("cart", {})
@@ -115,6 +128,7 @@ def remove_from_cart(request, product_id):
 
 
 @login_required
+@permission_required('store.can_purchase', raise_exception=True)
 def checkout(request):
     """
     Handle the checkout process.
@@ -201,6 +215,7 @@ def send_invoice_email(user, order):
 
 
 @login_required
+@permission_required('store.can_review', raise_exception=True)
 def leave_review(request, product_id):
     """Allow a buyer to leave a review on a product."""
     product = get_object_or_404(Product, id=product_id)
@@ -234,12 +249,9 @@ def leave_review(request, product_id):
 
 
 @login_required
+@permission_required('store.can_manage_store', raise_exception=True)
 def vendor_dashboard(request):
     """Display the vendor dashboard showing all their stores."""
-    if not request.user.groups.filter(name="vendor").exists():
-        messages.error(request, "You are not a vendor")
-        return redirect("store_list")
-
     stores = Store.objects.filter(owner=request.user)
     return render(
         request,
@@ -249,6 +261,7 @@ def vendor_dashboard(request):
 
 
 @login_required
+@permission_required('store.can_manage_store', raise_exception=True)
 def vendor_store_detail(request, store_id):
     """Display a single store with its products for the vendor."""
     store = get_object_or_404(Store, id=store_id, owner=request.user)
@@ -261,12 +274,9 @@ def vendor_store_detail(request, store_id):
 
 
 @login_required
+@permission_required('store.can_manage_store', raise_exception=True)
 def create_store(request):
     """Allow a vendor to create a new store."""
-    if not request.user.groups.filter(name="vendor").exists():
-        messages.error(request, "You are not a vendor")
-        return redirect("store_list")
-
     if request.method == "POST":
         name = request.POST.get("name")
         description = request.POST.get("description")
@@ -284,6 +294,7 @@ def create_store(request):
 
 
 @login_required
+@permission_required('store.can_manage_store', raise_exception=True)
 def edit_store(request, store_id):
     """Allow a vendor to edit one of their stores."""
     store = get_object_or_404(Store, id=store_id, owner=request.user)
@@ -300,6 +311,7 @@ def edit_store(request, store_id):
 
 
 @login_required
+@permission_required('store.can_manage_store', raise_exception=True)
 def delete_store(request, store_id):
     """Allow a vendor to delete one of their stores."""
     store = get_object_or_404(Store, id=store_id, owner=request.user)
@@ -312,6 +324,7 @@ def delete_store(request, store_id):
 
 
 @login_required
+@permission_required('store.can_manage_product', raise_exception=True)
 def add_product(request, store_id):
     """Allow a vendor to add a product to one of their stores."""
     store = get_object_or_404(Store, id=store_id, owner=request.user)
@@ -337,6 +350,7 @@ def add_product(request, store_id):
 
 
 @login_required
+@permission_required('store.can_manage_product', raise_exception=True)
 def edit_product(request, product_id):
     """Allow a vendor to edit one of their products."""
     product = get_object_or_404(
@@ -359,6 +373,7 @@ def edit_product(request, product_id):
 
 
 @login_required
+@permission_required('store.can_manage_product', raise_exception=True)
 def delete_product(request, product_id):
     """Allow a vendor to delete one of their products."""
     product = get_object_or_404(
@@ -372,3 +387,115 @@ def delete_product(request, product_id):
         messages.success(request, "Product deleted successfully")
 
     return redirect("vendor_dashboard")
+
+
+# API VIEWS (these return JSON, not HTML pages)
+@api_view(['GET'])
+def api_get_vendor_stores(request, vendor_id):
+    """
+    GET /api/vendors/<vendor_id>/stores/
+    Anyone can call this — no login needed.
+    Returns all stores belonging to a vendor.
+    """
+    stores = Store.objects.filter(owner__id=vendor_id)
+    serializer = StoreSerializer(stores, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def api_get_store_products(request, store_id):
+    """
+    GET /api/stores/<store_id>/products/
+    Anyone can call this — no login needed.
+    Returns all products in a specific store.
+    """
+    store = get_object_or_404(Store, id=store_id)
+    products = Product.objects.filter(store=store)
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def api_create_store(request):
+    """
+    POST /api/stores/create/
+    Only logged-in vendors can use this.
+    Send JSON like: {"name": "My Shop", "description": "We sell stuff"}
+    The owner is set automatically to whoever is logged in.
+    """
+    if not request.user.groups.filter(name='vendor').exists():
+        return Response(
+            {'error': 'Only vendors can create stores.'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    data = request.data.copy()
+    data['owner'] = request.user.id
+
+    serializer = StoreSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+        )
+    return Response(
+        serializer.errors,
+        status=status.HTTP_400_BAD_REQUEST,
+    )
+
+
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def api_add_product(request, store_id):
+    """
+    POST /api/stores/<store_id>/products/add/
+    Only the vendor who OWNS this store can add products.
+    Send JSON like:
+    {
+        "name": "Cool Shirt",
+        "description": "Very cool",
+        "price": "19.99",
+        "stock": 50
+    }
+    """
+    if not request.user.groups.filter(name='vendor').exists():
+        return Response(
+            {'error': 'Only vendors can add products.'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    store = get_object_or_404(Store, id=store_id, owner=request.user)
+
+    data = request.data.copy()
+    data['store'] = store.id
+
+    serializer = ProductSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+        )
+    return Response(
+        serializer.errors,
+        status=status.HTTP_400_BAD_REQUEST,
+    )
+
+
+@api_view(['GET'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def api_get_product_reviews(request, product_id):
+    """
+    GET /api/products/<product_id>/reviews/
+    Only logged-in users can see reviews via API.
+    Returns all reviews for a specific product.
+    """
+    product = get_object_or_404(Product, id=product_id)
+    reviews = Review.objects.filter(product=product)
+    serializer = ReviewSerializer(reviews, many=True)
+    return Response(serializer.data)
