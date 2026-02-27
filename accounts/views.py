@@ -1,21 +1,24 @@
-from django.shortcuts import render, redirect
+from datetime import timedelta
+
+import hashlib
+import secrets
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
-from django.utils import timezone
 from django.core.mail import EmailMessage
 from django.conf import settings
-import hashlib
-import secrets
-import datetime
+from django.shortcuts import render, redirect
+from django.utils import timezone
+
 from .models import UserProfile, ResetToken
 
 
 def register_user(request):
     """Handle user registration for both vendors and buyers."""
     if request.method == "POST":
-        username = request.POST.get("username")
-        email = request.POST.get("email")
+        username = request.POST.get("username", "").strip()
+        email = request.POST.get("email", "").strip()
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
         account_type = request.POST.get("account_type")
@@ -25,7 +28,10 @@ def register_user(request):
             return render(request, "accounts/register.html")
 
         if len(password) < 8:
-            messages.error(request, "Password must be at least 8 characters")
+            messages.error(
+                request,
+                "Password must be at least 8 characters",
+            )
             return render(request, "accounts/register.html")
 
         if User.objects.filter(username=username).exists():
@@ -83,37 +89,47 @@ def logout_user(request):
 def forgot_password(request):
     """Handle forgotten password requests by sending a reset email."""
     if request.method == "POST":
-        email = request.POST.get("email")
+        email = request.POST.get("email", "").strip()
+
         try:
             user = User.objects.get(email=email)
+
+            raw_token = secrets.token_urlsafe(32)
+            hashed_token = hashlib.sha1(
+                raw_token.encode()
+            ).hexdigest()
+
+            ResetToken.objects.create(
+                user=user,
+                token=hashed_token,
+                expiry_date=timezone.now() + timedelta(minutes=5),
+            )
+
+            reset_url = (
+                f"http://localhost:8000/accounts/"
+                f"reset-password/{raw_token}/"
+            )
+
+            email_message = EmailMessage(
+                subject="Password Reset Request",
+                body=(
+                    f"Click the link below to reset your password.\n\n"
+                    f"{reset_url}\n\n"
+                    f"This link expires in 5 minutes."
+                ),
+                from_email=settings.EMAIL_HOST_USER,
+                to=[user.email],
+            )
+            email_message.send()
+
         except User.DoesNotExist:
-            messages.error(request, "No account found with that email")
-            return render(request, "accounts/forgot_password.html")
+            pass
 
-        raw_token = secrets.token_urlsafe(32)
-        hashed_token = hashlib.sha1(raw_token.encode()).hexdigest()
-
-        expiry = timezone.now() + datetime.timedelta(minutes=5)
-
-        ResetToken.objects.create(
-            user=user,
-            token=hashed_token,
-            expiry_date=expiry,
+        messages.success(
+            request,
+            "If an account exists with that email, "
+            "a reset link has been sent",
         )
-
-        reset_url = (
-            f"http://localhost:8000/accounts/reset-password/{raw_token}/"
-        )
-
-        email_message = EmailMessage(
-            subject="Password Reset Request",
-            body=f"Click the link to reset your password: {reset_url}",
-            from_email=settings.EMAIL_HOST_USER,
-            to=[user.email],
-        )
-        email_message.send()
-
-        messages.success(request, "Password reset link sent to your email")
         return redirect("login")
 
     return render(request, "accounts/forgot_password.html")
@@ -149,11 +165,25 @@ def reset_password(request, token):
                 {"token": token},
             )
 
+        if len(password) < 8:
+            messages.error(
+                request,
+                "Password must be at least 8 characters",
+            )
+            return render(
+                request,
+                "accounts/reset_password.html",
+                {"token": token},
+            )
+
         reset_token.user.set_password(password)
         reset_token.user.save()
         reset_token.delete()
 
-        messages.success(request, "Password reset successful, please log in")
+        messages.success(
+            request,
+            "Password reset successfully, please log in",
+        )
         return redirect("login")
 
     return render(
