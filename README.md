@@ -96,12 +96,41 @@ A web-based eCommerce platform built with Django and MariaDB. Users can register
     exit()
     ```
 
-9. Run the development server:
+9. Set up group permissions. In the same shell run the following:
+    ```
+    python manage.py shell
+    ```
+    ```python
+    from django.contrib.auth.models import Group, Permission
+    from django.contrib.contenttypes.models import ContentType
+    from store.models import Store, Product, Order, Review
+
+    store_ct = ContentType.objects.get_for_model(Store)
+    product_ct = ContentType.objects.get_for_model(Product)
+    order_ct = ContentType.objects.get_for_model(Order)
+    review_ct = ContentType.objects.get_for_model(Review)
+
+    can_manage_store = Permission.objects.get_or_create(codename='can_manage_store', name='Can manage stores', content_type=store_ct)[0]
+    can_manage_product = Permission.objects.get_or_create(codename='can_manage_product', name='Can manage products', content_type=product_ct)[0]
+    can_purchase = Permission.objects.get_or_create(codename='can_purchase', name='Can purchase products', content_type=order_ct)[0]
+    can_review = Permission.objects.get_or_create(codename='can_review', name='Can leave reviews', content_type=review_ct)[0]
+
+    vendor = Group.objects.get(name='vendor')
+    buyer = Group.objects.get(name='buyer')
+
+    vendor.permissions.set([can_manage_store, can_manage_product])
+    buyer.permissions.set([can_purchase, can_review])
+
+    print('Permissions set successfully')
+    exit()
+    ```
+
+10. Run the development server:
     ```
     python manage.py runserver
     ```
 
-10. Visit `http://localhost:8000` in your browser.
+11. Visit `http://localhost:8000` in your browser.
 
 ## Usage
 
@@ -116,6 +145,9 @@ If the email server is unavailable or credentials are incorrect, the application
 continue to function normally. Checkouts will still be processed and orders saved to
 the database, but invoice emails will not be sent. A warning message will be displayed
 to the user in this case.
+
+For security reasons, the password reset page does not confirm whether an email
+address is registered in the system.
 
 ## Project Structure
 
