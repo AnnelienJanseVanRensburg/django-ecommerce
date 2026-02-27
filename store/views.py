@@ -33,15 +33,25 @@ def product_list(request, store_id):
     )
 
 
-@login_required
 def product_detail(request, product_id):
     """Display full details of a single product including reviews."""
     product = get_object_or_404(Product, id=product_id)
     reviews = Review.objects.filter(product=product)
+    user_reviewed = (
+        request.user.is_authenticated
+        and Review.objects.filter(
+            product=product,
+            reviewer=request.user,
+        ).exists()
+    )
     return render(
         request,
         "store/product_detail.html",
-        {"product": product, "reviews": reviews},
+        {
+            "product": product,
+            "reviews": reviews,
+            "user_reviewed": user_reviewed,
+        },
     )
 
 
@@ -156,20 +166,39 @@ def checkout(request):
                 request,
                 f"{product.name} is out of stock and was removed",
             )
-            del cart[product_id_str]
-            request.session["cart"] = cart
-            request.session.modified = True
             continue
 
-        OrderItem.objects.create(
-            order=order,
-            product=product,
-            quantity=item["quantity"],
-            price_at_purchase=product.price,
-        )
+        if item["quantity"] > product.stock:
+            OrderItem.objects.create(
+                order=order,
+                product=product,
+                quantity=product.stock,
+                price_at_purchase=product.price,
+            )
+            messages.warning(
+                request,
+                f"Only {product.stock} units of {product.name} "
+                f"were available so your order was adjusted",
+            )
+            product.stock = 0
+            product.save()
+        else:
+            OrderItem.objects.create(
+                order=order,
+                product=product,
+                quantity=item["quantity"],
+                price_at_purchase=product.price,
+            )
+            product.stock -= item["quantity"]
+            product.save()
 
-        product.stock -= item["quantity"]
-        product.save()
+    if not OrderItem.objects.filter(order=order).exists():
+        order.delete()
+        messages.error(
+            request,
+            "All items in your cart are out of stock",
+        )
+        return redirect("view_cart")
 
     order.calculate_total()
 
@@ -225,6 +254,15 @@ def leave_review(request, product_id):
         product=product,
     ).exists()
 
+    already_reviewed = Review.objects.filter(
+        product=product,
+        reviewer=request.user,
+    ).exists()
+
+    if already_reviewed:
+        messages.error(request, "You have already reviewed this product")
+        return redirect("product_detail", product_id=product_id)
+
     if request.method == "POST":
         rating = request.POST.get("rating")
         comment = request.POST.get("comment")
@@ -239,7 +277,7 @@ def leave_review(request, product_id):
         review.set_verified_status(has_purchased)
 
         messages.success(request, "Review submitted successfully")
-        return redirect("product_list", store_id=product.store.id)
+        return redirect("product_detail", product_id=product_id)
 
     return render(
         request,
@@ -281,6 +319,10 @@ def create_store(request):
         name = request.POST.get("name")
         description = request.POST.get("description")
 
+        if not name:
+            messages.error(request, "Store name is required")
+            return render(request, "store/create_store.html")
+
         Store.objects.create(
             owner=request.user,
             name=name,
@@ -305,7 +347,7 @@ def edit_store(request, store_id):
         store.save()
 
         messages.success(request, "Store updated successfully")
-        return redirect("vendor_dashboard")
+        return redirect("vendor_store_detail", store_id=store.id)
 
     return render(request, "store/edit_store.html", {"store": store})
 
@@ -335,6 +377,30 @@ def add_product(request, store_id):
         price = request.POST.get("price")
         stock = request.POST.get("stock")
 
+        if not name:
+            messages.error(request, "Product name is required")
+            return render(
+                request,
+                "store/add_product.html",
+                {"store": store},
+            )
+
+        if not price:
+            messages.error(request, "Product price is required")
+            return render(
+                request,
+                "store/add_product.html",
+                {"store": store},
+            )
+
+        if not stock:
+            messages.error(request, "Product stock is required")
+            return render(
+                request,
+                "store/add_product.html",
+                {"store": store},
+            )
+
         Product.objects.create(
             store=store,
             name=name,
@@ -344,7 +410,7 @@ def add_product(request, store_id):
         )
 
         messages.success(request, "Product added successfully")
-        return redirect("vendor_dashboard")
+        return redirect("vendor_store_detail", store_id=store.id)
 
     return render(request, "store/add_product.html", {"store": store})
 
@@ -367,7 +433,7 @@ def edit_product(request, product_id):
         product.save()
 
         messages.success(request, "Product updated successfully")
-        return redirect("vendor_dashboard")
+        return redirect("vendor_store_detail", store_id=product.store.id)
 
     return render(request, "store/edit_product.html", {"product": product})
 
@@ -383,8 +449,10 @@ def delete_product(request, product_id):
     )
 
     if request.method == "POST":
+        store_id = product.store.id
         product.delete()
         messages.success(request, "Product deleted successfully")
+        return redirect("vendor_store_detail", store_id=store_id)
 
     return redirect("vendor_dashboard")
 

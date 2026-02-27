@@ -30,8 +30,8 @@ nav a:hover { text-decoration: underline; }
 }
 
 .messages .error { background-color: #ffcccc; }
-
 .messages .success { background-color: #ccffcc; }
+.messages .warning { background-color: #fff3cc; }
 
 .card {
     background: white;
@@ -39,6 +39,10 @@ nav a:hover { text-decoration: underline; }
     margin-bottom: 15px;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card form {
+    display: inline;
 }
 
 input, textarea, select {
@@ -50,6 +54,11 @@ input, textarea, select {
     box-sizing: border-box;
 }
 
+input[type="number"] {
+    width: 80px;
+    padding: 6px;
+}
+
 button, .btn {
     background-color: #333;
     color: white;
@@ -59,6 +68,8 @@ button, .btn {
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
+    margin: 4px;
+    width: auto;
 }
 
 button:hover, .btn:hover { background-color: #555; }
@@ -90,3 +101,9 @@ button:hover, .btn:hover { background-color: #555; }
 .btn + .btn, .btn + form, form + .btn, form + form {
     margin-left: 8px;
 }
+
+h1 { color: #333; }
+
+h2 { margin-top: 0; }
+
+h3, h4 { margin-top: 15px; }

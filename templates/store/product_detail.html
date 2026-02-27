@@ -32,6 +32,8 @@
             {% else %}
                 <p><em>You own this store</em></p>
             {% endif %}
+        {% else %}
+            <p><a href="{% url 'login' %}">Log in</a> to purchase this product or leave a review</p>
         {% endif %}
 
         <h3>Reviews</h3>
