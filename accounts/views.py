@@ -53,7 +53,7 @@ def register_user(request):
             account_type=account_type,
         )
 
-        group = Group.objects.get(name=account_type)
+        group, _ = Group.objects.get_or_create(name=account_type)
         user.groups.add(group)
 
         login(request, user)

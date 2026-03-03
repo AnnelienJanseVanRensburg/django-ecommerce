@@ -18,6 +18,15 @@ class UserProfile(models.Model):
         choices=ACCOUNT_TYPES,
     )
 
+    class Meta:
+        """Define custom permissions for user roles."""
+        permissions = [
+            ("can_manage_store", "Can manage stores"),
+            ("can_manage_product", "Can manage products"),
+            ("can_purchase", "Can purchase products"),
+            ("can_review", "Can leave reviews"),
+        ]
+
     def __str__(self):
         """Return a string representation of the UserProfile."""
         return f"{self.user.username} - {self.account_type}"

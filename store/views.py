@@ -56,7 +56,7 @@ def product_detail(request, product_id):
 
 
 @login_required
-@permission_required('store.can_purchase', raise_exception=True)
+@permission_required('accounts.can_purchase', raise_exception=True)
 def add_to_cart(request, product_id):
     """Add a product to the session cart with a specified quantity."""
     product = get_object_or_404(Product, id=product_id)
@@ -94,7 +94,7 @@ def add_to_cart(request, product_id):
 
 
 @login_required
-@permission_required('store.can_purchase', raise_exception=True)
+@permission_required('accounts.can_purchase', raise_exception=True)
 def view_cart(request):
     """Display the current session cart with subtotals and total."""
     cart = request.session.get("cart", {})
@@ -122,7 +122,7 @@ def view_cart(request):
 
 
 @login_required
-@permission_required('store.can_purchase', raise_exception=True)
+@permission_required('accounts.can_purchase', raise_exception=True)
 def remove_from_cart(request, product_id):
     """Remove a product from the session cart."""
     cart = request.session.get("cart", {})
@@ -138,7 +138,7 @@ def remove_from_cart(request, product_id):
 
 
 @login_required
-@permission_required('store.can_purchase', raise_exception=True)
+@permission_required('accounts.can_purchase', raise_exception=True)
 def checkout(request):
     """
     Handle the checkout process.
@@ -244,7 +244,7 @@ def send_invoice_email(user, order):
 
 
 @login_required
-@permission_required('store.can_review', raise_exception=True)
+@permission_required('accounts.can_review', raise_exception=True)
 def leave_review(request, product_id):
     """Allow a buyer to leave a review on a product."""
     product = get_object_or_404(Product, id=product_id)
@@ -287,7 +287,7 @@ def leave_review(request, product_id):
 
 
 @login_required
-@permission_required('store.can_manage_store', raise_exception=True)
+@permission_required('accounts.can_manage_store', raise_exception=True)
 def vendor_dashboard(request):
     """Display the vendor dashboard showing all their stores."""
     stores = Store.objects.filter(owner=request.user)
@@ -299,7 +299,7 @@ def vendor_dashboard(request):
 
 
 @login_required
-@permission_required('store.can_manage_store', raise_exception=True)
+@permission_required('accounts.can_manage_store', raise_exception=True)
 def vendor_store_detail(request, store_id):
     """Display a single store with its products for the vendor."""
     store = get_object_or_404(Store, id=store_id, owner=request.user)
@@ -312,7 +312,7 @@ def vendor_store_detail(request, store_id):
 
 
 @login_required
-@permission_required('store.can_manage_store', raise_exception=True)
+@permission_required('accounts.can_manage_store', raise_exception=True)
 def create_store(request):
     """Allow a vendor to create a new store."""
     if request.method == "POST":
@@ -336,7 +336,7 @@ def create_store(request):
 
 
 @login_required
-@permission_required('store.can_manage_store', raise_exception=True)
+@permission_required('accounts.can_manage_store', raise_exception=True)
 def edit_store(request, store_id):
     """Allow a vendor to edit one of their stores."""
     store = get_object_or_404(Store, id=store_id, owner=request.user)
@@ -353,7 +353,7 @@ def edit_store(request, store_id):
 
 
 @login_required
-@permission_required('store.can_manage_store', raise_exception=True)
+@permission_required('accounts.can_manage_store', raise_exception=True)
 def delete_store(request, store_id):
     """Allow a vendor to delete one of their stores."""
     store = get_object_or_404(Store, id=store_id, owner=request.user)
@@ -366,7 +366,7 @@ def delete_store(request, store_id):
 
 
 @login_required
-@permission_required('store.can_manage_product', raise_exception=True)
+@permission_required('accounts.can_manage_product', raise_exception=True)
 def add_product(request, store_id):
     """Allow a vendor to add a product to one of their stores."""
     store = get_object_or_404(Store, id=store_id, owner=request.user)
@@ -416,7 +416,7 @@ def add_product(request, store_id):
 
 
 @login_required
-@permission_required('store.can_manage_product', raise_exception=True)
+@permission_required('accounts.can_manage_product', raise_exception=True)
 def edit_product(request, product_id):
     """Allow a vendor to edit one of their products."""
     product = get_object_or_404(
@@ -439,7 +439,7 @@ def edit_product(request, product_id):
 
 
 @login_required
-@permission_required('store.can_manage_product', raise_exception=True)
+@permission_required('accounts.can_manage_product', raise_exception=True)
 def delete_product(request, product_id):
     """Allow a vendor to delete one of their products."""
     product = get_object_or_404(

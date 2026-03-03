@@ -1,10 +1,11 @@
 # Django eCommerce Application
 
 A web-based eCommerce platform built with Django and MariaDB. Users can register as vendors or buyers. Vendors can create stores and manage products, while buyers can browse stores, add products to their cart, checkout, and leave reviews.
+Includes a RESTful API built with Django REST Framework.
 
 ## Features
 
-- User registration and login as vendor or buyer
+- User registration and login (vendor or buyer roles)
 - Password reset via email with time-limited tokens
 - Vendors can create, edit, and delete stores and products
 - Buyers can add products to a session-based cart and checkout
@@ -16,6 +17,7 @@ A web-based eCommerce platform built with Django and MariaDB. Users can register
 
 - Python 3.x
 - MariaDB
+- A Gmail account with an App Password for email functionality
 
 ## Installation
 
@@ -79,63 +81,25 @@ A web-based eCommerce platform built with Django and MariaDB. Users can register
     python manage.py makemigrations
     python manage.py migrate
     ```
+    Note: User groups (vendor and buyer) and their permissions are created
+    automatically when migrations are run.
 
 7. Create a superuser for the admin panel:
     ```
     python manage.py createsuperuser
     ```
 
-8. Create the vendor and buyer groups:
-    ```
-    python manage.py shell
-    ```
-    ```python
-    from django.contrib.auth.models import Group
-    Group.objects.create(name='vendor')
-    Group.objects.create(name='buyer')
-    exit()
-    ```
-
-9. Set up group permissions. In the same shell run the following:
-    ```
-    python manage.py shell
-    ```
-    ```python
-    from django.contrib.auth.models import Group, Permission
-    from django.contrib.contenttypes.models import ContentType
-    from store.models import Store, Product, Order, Review
-
-    store_ct = ContentType.objects.get_for_model(Store)
-    product_ct = ContentType.objects.get_for_model(Product)
-    order_ct = ContentType.objects.get_for_model(Order)
-    review_ct = ContentType.objects.get_for_model(Review)
-
-    can_manage_store = Permission.objects.get_or_create(codename='can_manage_store', name='Can manage stores', content_type=store_ct)[0]
-    can_manage_product = Permission.objects.get_or_create(codename='can_manage_product', name='Can manage products', content_type=product_ct)[0]
-    can_purchase = Permission.objects.get_or_create(codename='can_purchase', name='Can purchase products', content_type=order_ct)[0]
-    can_review = Permission.objects.get_or_create(codename='can_review', name='Can leave reviews', content_type=review_ct)[0]
-
-    vendor = Group.objects.get(name='vendor')
-    buyer = Group.objects.get(name='buyer')
-
-    vendor.permissions.set([can_manage_store, can_manage_product])
-    buyer.permissions.set([can_purchase, can_review])
-
-    print('Permissions set successfully')
-    exit()
-    ```
-
-10. Run the development server:
+8. Run the development server:
     ```
     python manage.py runserver
     ```
 
-11. Visit `http://localhost:8000` in your browser.
+9. Visit `http://localhost:8000` in your browser.
 
 ## Usage
 
 - Register as a vendor to create stores and add products
-- Register as a buyer to browse stores, add items to your cart, and checkout
+- Register as a buyer to browse stores, add items to your cart, checkout, and leave reviews 
 - Access the admin panel at `http://localhost:8000/admin`
 
 ## Email Configuration
@@ -152,12 +116,13 @@ address is registered in the system.
 ## Project Structure
 
 ```
-ecommerce_project/
-├── accounts/        - Authentication app (register, login, password reset)
-├── store/           - Shop app (stores, products, cart, checkout, reviews)
-├── templates/       - HTML templates
-├── static/          - CSS and static files
-├── .env             - Environment variables (not included in version control)
-├── requirements.txt - Project dependencies
+eCommerce-Web-App/
+├── accounts/           - Authentication app (register, login, password reset)
+├── ecommerce_project/  - Main files
+├── store/              - Shop app (stores, products, cart, checkout, reviews)
+├── templates/          - HTML templates
+├── static/             - CSS and static files
+├── .env                - Environment variables (not included in version control)
+├── requirements.txt    - Project dependencies
 └── manage.py
 ```
