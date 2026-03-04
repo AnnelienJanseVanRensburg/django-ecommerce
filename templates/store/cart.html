@@ -3,26 +3,53 @@
 {% block title %}Your Cart{% endblock %}
 
 {% block content %}
-    <h2>Your Cart</h2>
+<div class="ec-page-header">
+    <h2 class="mb-0"><i class="bi bi-cart3 me-2"></i>Your Cart</h2>
+</div>
 
-    {% if cart_items %}
-        {% for item in cart_items %}
-            <div class="card">
-                <h3>{{ item.name }}</h3>
-                <p>Price: R{{ item.price }}</p>
-                <p>Quantity: {{ item.quantity }}</p>
-                <p>Subtotal: R{{ item.subtotal }}</p>
-                <a href="{% url 'remove_from_cart' item.product_id %}" class="btn btn-danger">Remove</a>
-            </div>
-        {% endfor %}
-
-        <div class="card">
-            <h3>Total: R{{ total }}</h3>
-            <a href="{% url 'checkout' %}" class="btn">Proceed to Checkout</a>
+{% if cart_items %}
+    <div class="row">
+        <div class="col-lg-8">
+            {% for item in cart_items %}
+                <div class="ec-card d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">{{ item.name }}</h5>
+                        <span class="text-muted">R{{ item.price }} &times; {{ item.quantity }}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="fw-bold fs-5" style="color: var(--ec-sienna);">R{{ item.subtotal }}</span>
+                        <a href="{% url 'remove_from_cart' item.product_id %}" class="btn btn-ec-danger btn-sm">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-        <a href="{% url 'store_list' %}" class="btn">Continue Shopping</a>
-    {% else %}
-        <p>Your cart is empty</p>
-        <a href="{% url 'store_list' %}" class="btn">Continue Shopping</a>
-    {% endif %}
+        <div class="col-lg-4">
+            <div class="ec-card-flat">
+                <h4 class="mb-3">Order Summary</h4>
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Total</span>
+                    <span class="fw-bold fs-5" style="color: var(--ec-sienna);">R{{ total }}</span>
+                </div>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'checkout' %}" class="btn btn-ec-primary">
+                        <i class="bi bi-bag-check me-1"></i>Proceed to Checkout
+                    </a>
+                    <a href="{% url 'store_list' %}" class="btn btn-ec-outline">
+                        <i class="bi bi-arrow-left me-1"></i>Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="ec-card-flat text-center py-5">
+        <i class="bi bi-cart-x" style="font-size: 3rem; color: var(--ec-sandy);"></i>
+        <p class="mt-3 mb-3" style="color: #888;">Your cart is empty</p>
+        <a href="{% url 'store_list' %}" class="btn btn-ec-outline">
+            <i class="bi bi-arrow-left me-1"></i>Continue Shopping
+        </a>
+    </div>
+{% endif %}
 {% endblock %}

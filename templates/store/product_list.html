@@ -3,21 +3,38 @@
 {% block title %}{{ store.name }}{% endblock %}
 
 {% block content %}
-    <h2>{{ store.name }}</h2>
-    <p>{{ store.description }}</p>
+<div class="ec-page-header">
+    <h2 class="mb-1">{{ store.name }}</h2>
+    <p class="text-muted mb-0">{{ store.description }}</p>
+</div>
 
-    {% for product in products %}
-        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-            <span>
-                <a href="{% url 'product_detail' product.id %}">{{ product.name }}</a>
-                — R{{ product.price }}
-                {% if product.stock == 0 %}<em>(Out of stock)</em>{% endif %}
-            </span>
+{% for product in products %}
+    <div class="ec-card d-flex justify-content-between align-items-center">
+        <div>
+            <a href="{% url 'product_detail' product.id %}" class="text-decoration-none">
+                <h5 class="mb-1" style="color: var(--ec-brown);">{{ product.name }}</h5>
+            </a>
+            <span class="fw-bold" style="color: var(--ec-sienna);">R{{ product.price }}</span>
         </div>
-    {% empty %}
-        <p>No products in this store yet</p>
-    {% endfor %}
+        <div class="d-flex align-items-center gap-2">
+            {% if product.stock == 0 %}
+                <span class="badge-ec-out"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
+            {% else %}
+                <span class="badge-ec-stock"><i class="bi bi-check-circle me-1"></i>{{ product.stock }} in stock</span>
+            {% endif %}
+            <a href="{% url 'product_detail' product.id %}" class="btn btn-ec-outline btn-sm">
+                View
+            </a>
+        </div>
+    </div>
+{% empty %}
+    <div class="ec-card-flat text-center py-5">
+        <i class="bi bi-box" style="font-size: 3rem; color: var(--ec-sandy);"></i>
+        <p class="mt-3 mb-0" style="color: #888;">No products in this store yet</p>
+    </div>
+{% endfor %}
 
-    <br>
-    <a href="{% url 'store_list' %}" class="btn">Back to Stores</a>
+<a href="{% url 'store_list' %}" class="btn btn-ec-outline mt-2">
+    <i class="bi bi-arrow-left me-1"></i>Back to Stores
+</a>
 {% endblock %}

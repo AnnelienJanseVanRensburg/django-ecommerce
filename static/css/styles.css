@@ -1,109 +1,303 @@
+/* ─── Terracotta Market — Custom Styles ─────────────────────────── */
+
+/* Google Fonts are loaded in base.html */
+
+:root {
+    --ec-sienna:     #E35336;
+    --ec-beige:      #F5F5DC;
+    --ec-sandy:      #F4A460;
+    --ec-brown:      #A0522D;
+    --ec-dark:       #3B1F10;
+    --ec-light:      #FDF8F2;
+    --ec-border:     #E8D5C0;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────── */
+
 body {
-    font-family: Arial, sans-serif;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f5f5f5;
+    font-family: 'Lato', sans-serif;
+    background-color: var(--ec-light);
+    color: var(--ec-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-nav {
-    background-color: #333;
-    padding: 10px;
-    margin-bottom: 20px;
-    border-radius: 5px;
+h1, h2, h3, h4, h5 {
+    font-family: 'Playfair Display', serif;
+    color: var(--ec-brown);
 }
 
-nav a {
-    color: white;
+/* ─── Navbar ─────────────────────────────────────────────────────── */
+
+.ec-navbar {
+    background-color: var(--ec-brown);
+    border-bottom: 3px solid var(--ec-sienna);
+    padding: 0.75rem 0;
+}
+
+.ec-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ec-beige) !important;
+    letter-spacing: 0.5px;
+}
+
+.ec-navbar .nav-link {
+    color: var(--ec-beige) !important;
+    font-weight: 400;
+    transition: color 0.2s;
+    opacity: 0.9;
+}
+
+.ec-navbar .nav-link:hover {
+    color: var(--ec-sandy) !important;
+    opacity: 1;
+}
+
+.ec-nav-user {
+    font-weight: 700;
+}
+
+.ec-logout-text {
+    font-size: 0.85rem;
+    opacity: 0.75;
+    font-weight: 300;
+}
+
+.ec-btn-outline-light {
+    border: 2px solid var(--ec-beige);
+    color: var(--ec-beige);
+    border-radius: 20px;
+    padding: 0.35rem 1.1rem;
+    font-weight: 700;
+    font-size: 0.9rem;
     text-decoration: none;
-    margin-right: 15px;
+    transition: all 0.2s;
 }
 
-nav a:hover { text-decoration: underline; }
-
-.messages { list-style: none; padding: 0; }
-
-.messages li {
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
+.ec-btn-outline-light:hover {
+    background-color: var(--ec-beige);
+    color: var(--ec-brown);
 }
 
-.messages .error { background-color: #ffcccc; }
-.messages .success { background-color: #ccffcc; }
-.messages .warning { background-color: #fff3cc; }
+/* ─── Alerts ─────────────────────────────────────────────────────── */
 
-.card {
-    background: white;
-    padding: 20px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.ec-alert-error {
+    background-color: #fde8e4;
+    border-color: var(--ec-sienna);
+    color: #8b2010;
 }
 
-.card form {
-    display: inline;
+.ec-alert-success {
+    background-color: #edf7ee;
+    border-color: #5a9e6f;
+    color: #2d6b3f;
 }
 
-input, textarea, select {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
+.ec-alert-warning {
+    background-color: #fef8ec;
+    border-color: var(--ec-sandy);
+    color: #7a5a1a;
 }
 
-input[type="number"] {
-    width: 80px;
-    padding: 6px;
+.ec-alert-info {
+    background-color: #eef4fb;
+    border-color: #7aaed6;
+    color: #1a4a7a;
 }
 
-button, .btn {
-    background-color: #333;
-    color: white;
-    padding: 10px 20px;
+/* ─── Cards ──────────────────────────────────────────────────────── */
+
+.ec-card {
+    background-color: #fff;
+    border: 1px solid var(--ec-border);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(160, 82, 45, 0.08);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.ec-card:hover {
+    box-shadow: 0 4px 16px rgba(160, 82, 45, 0.15);
+    transform: translateY(-2px);
+}
+
+.ec-card-flat {
+    background-color: #fff;
+    border: 1px solid var(--ec-border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────── */
+
+.btn-ec-primary {
+    background-color: var(--ec-sienna);
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    color: #fff;
+    font-weight: 700;
+    border-radius: 6px;
+    padding: 0.5rem 1.25rem;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-ec-primary:hover {
+    background-color: #c43e25;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.btn-ec-secondary {
+    background-color: var(--ec-sandy);
+    border: none;
+    color: var(--ec-dark);
+    font-weight: 700;
+    border-radius: 6px;
+    padding: 0.5rem 1.25rem;
+    transition: background-color 0.2s;
+}
+
+.btn-ec-secondary:hover {
+    background-color: #e08a3a;
+    color: var(--ec-dark);
+}
+
+.btn-ec-outline {
+    background-color: transparent;
+    border: 2px solid var(--ec-brown);
+    color: var(--ec-brown);
+    font-weight: 700;
+    border-radius: 6px;
+    padding: 0.45rem 1.2rem;
+    transition: all 0.2s;
     text-decoration: none;
     display: inline-block;
-    margin: 4px;
-    width: auto;
 }
 
-button:hover, .btn:hover { background-color: #555; }
-.btn-danger { background-color: #cc0000; }
-.btn-danger:hover { background-color: #ff0000; }
+.btn-ec-outline:hover {
+    background-color: var(--ec-brown);
+    color: #fff;
+}
+
+.btn-ec-danger {
+    background-color: #c0392b;
+    border: none;
+    color: #fff;
+    font-weight: 700;
+    border-radius: 6px;
+    padding: 0.5rem 1.25rem;
+    transition: background-color 0.2s;
+}
+
+.btn-ec-danger:hover {
+    background-color: #96281b;
+    color: #fff;
+}
+
+/* ─── Forms ──────────────────────────────────────────────────────── */
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--ec-sandy);
+    box-shadow: 0 0 0 0.2rem rgba(244, 164, 96, 0.25);
+}
+
+.form-label {
+    font-weight: 700;
+    color: var(--ec-brown);
+    margin-bottom: 0.3rem;
+}
+
+/* ─── Page Header ────────────────────────────────────────────────── */
+
+.ec-page-header {
+    border-bottom: 2px solid var(--ec-border);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+/* ─── Badges ─────────────────────────────────────────────────────── */
+
+.badge-ec-verified {
+    background-color: #edf7ee;
+    color: #2d6b3f;
+    border: 1px solid #5a9e6f;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 20px;
+}
+
+.badge-ec-unverified {
+    background-color: #f5f5f5;
+    color: #666;
+    border: 1px solid #ccc;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 20px;
+}
+
+.badge-ec-stock {
+    background-color: #fef8ec;
+    color: #7a5a1a;
+    border: 1px solid var(--ec-sandy);
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 20px;
+}
+
+.badge-ec-out {
+    background-color: #fde8e4;
+    color: #8b2010;
+    border: 1px solid var(--ec-sienna);
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 20px;
+}
+
+/* ─── Stars ──────────────────────────────────────────────────────── */
+
+.ec-stars {
+    color: var(--ec-sandy);
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────── */
+
+.ec-footer {
+    background-color: var(--ec-brown);
+    border-top: 3px solid var(--ec-sienna);
+    margin-top: auto;
+}
+
+.ec-footer-text {
+    color: var(--ec-beige);
+    font-family: 'Lato', sans-serif;
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+/* ─── Password Toggle ────────────────────────────────────────────── */
 
 .password-wrapper {
     position: relative;
 }
 
-.password-wrapper input {
-    padding-right: 70px;
-}
-
 .toggle-password {
     position: absolute;
-    right: 8px;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: #333;
+    color: var(--ec-brown);
     cursor: pointer;
-    font-size: 13px;
     padding: 0;
-    width: auto;
+    font-size: 1rem;
 }
 
-.btn + .btn, .btn + form, form + .btn, form + form {
-    margin-left: 8px;
+.toggle-password:hover {
+    color: var(--ec-sienna);
 }
-
-h1 { color: #333; }
-
-h2 { margin-top: 0; }
-
-h3, h4 { margin-top: 15px; }

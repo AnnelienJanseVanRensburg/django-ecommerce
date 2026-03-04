@@ -3,27 +3,42 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-    <div class="card">
-        <h2>Login</h2>
-        <form method="POST">
-            {% csrf_token %}
-            <label>Username</label>
-            <input type="text" name="username" required>
-
-            <label>Password</label>
-            <div class="password-wrapper">
-                <input type="password" name="password" id="password" required>
-                <button type="button" class="toggle-password" onclick="togglePassword('password')">Show</button>
-            </div>
-
-            <button type="submit">Login</button>
-        </form>
-        <p>
-            <a href="{% url 'forgot_password' %}">Forgot your password?</a>
-        </p>
-        <p>
-            Don't have an account?
-            <a href="{% url 'register' %}">Register here</a>
-        </p>
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="ec-card-flat mt-4">
+            <h2 class="mb-4"><i class="bi bi-box-arrow-in-right me-2"></i>Login</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="password" id="password" class="form-control pe-5" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-ec-primary">Login</button>
+                </div>
+            </form>
+            <hr class="my-3">
+            <p class="text-center mb-1">
+                <a href="{% url 'forgot_password' %}" class="text-decoration-none" style="color: var(--ec-sienna);">
+                    Forgot your password?
+                </a>
+            </p>
+            <p class="text-center mb-0">
+                Don't have an account?
+                <a href="{% url 'register' %}" class="text-decoration-none fw-bold" style="color: var(--ec-brown);">
+                    Register here
+                </a>
+            </p>
+        </div>
     </div>
+</div>
 {% endblock %}

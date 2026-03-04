@@ -3,37 +3,64 @@
 {% block title %}{{ store.name }}{% endblock %}
 
 {% block content %}
-    <h2>{{ store.name }}</h2>
-    <p>{{ store.description }}</p>
+<div class="ec-page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h2 class="mb-1">{{ store.name }}</h2>
+        <p class="text-muted mb-0">{{ store.description }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'edit_store' store.id %}" class="btn btn-ec-secondary">
+            <i class="bi bi-pencil me-1"></i>Edit
+        </a>
+        <form method="POST" action="{% url 'delete_store' store.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ec-danger">
+                <i class="bi bi-trash me-1"></i>Delete
+            </button>
+        </form>
+    </div>
+</div>
 
-    <a href="{% url 'edit_store' store.id %}" class="btn">Edit Store</a>
-    <form method="POST" action="{% url 'delete_store' store.id %}" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Delete Store</button>
-    </form>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0"><i class="bi bi-box-seam me-2"></i>Products</h4>
+    <a href="{% url 'add_product' store.id %}" class="btn btn-ec-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Product
+    </a>
+</div>
 
-    <h3>Products</h3>
-    <a href="{% url 'add_product' store.id %}" class="btn">+ Add Product</a>
-
-    {% for product in products %}
-        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-            <span>
-                <strong>{{ product.name }}</strong> —
-                R{{ product.price }} —
-                Stock: {{ product.stock }}
-            </span>
-            <span>
-                <a href="{% url 'edit_product' product.id %}" class="btn">Edit</a>
-                <form method="POST" action="{% url 'delete_product' product.id %}" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </span>
+{% for product in products %}
+    <div class="ec-card d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-1">{{ product.name }}</h5>
+            <div class="d-flex gap-3">
+                <span style="color: var(--ec-sienna);" class="fw-bold">R{{ product.price }}</span>
+                {% if product.stock == 0 %}
+                    <span class="badge-ec-out"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
+                {% else %}
+                    <span class="badge-ec-stock"><i class="bi bi-check-circle me-1"></i>{{ product.stock }} in stock</span>
+                {% endif %}
+            </div>
         </div>
-    {% empty %}
-        <p>No products yet</p>
-    {% endfor %}
+        <div class="d-flex gap-2">
+            <a href="{% url 'edit_product' product.id %}" class="btn btn-ec-secondary btn-sm">
+                <i class="bi bi-pencil me-1"></i>Edit
+            </a>
+            <form method="POST" action="{% url 'delete_product' product.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-ec-danger btn-sm">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+{% empty %}
+    <div class="ec-card-flat text-center py-4">
+        <i class="bi bi-box" style="font-size: 2.5rem; color: var(--ec-sandy);"></i>
+        <p class="mt-3 mb-0" style="color: #888;">No products yet</p>
+    </div>
+{% endfor %}
 
-    <br>
-    <a href="{% url 'vendor_dashboard' %}" class="btn">Back to Dashboard</a>
+<a href="{% url 'vendor_dashboard' %}" class="btn btn-ec-outline mt-3">
+    <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+</a>
 {% endblock %}

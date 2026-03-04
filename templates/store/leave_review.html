@@ -3,31 +3,48 @@
 {% block title %}Leave a Review{% endblock %}
 
 {% block content %}
-    <div class="card">
-        <h2>Leave a Review for {{ product.name }}</h2>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="ec-card-flat">
+            <h2 class="mb-2"><i class="bi bi-star me-2"></i>Leave a Review</h2>
+            <p class="text-muted mb-4">for <strong>{{ product.name }}</strong></p>
 
-        {% if has_purchased %}
-            <p><em>You have purchased this product — your review will be marked as verified</em></p>
-        {% else %}
-            <p><em>You have not purchased this product — your review will be unverified</em></p>
-        {% endif %}
+            {% if has_purchased %}
+                <div class="alert mb-4" style="background-color: #edf7ee; border-color: #5a9e6f; color: #2d6b3f;">
+                    <i class="bi bi-patch-check me-2"></i>
+                    You have purchased this product — your review will be marked as verified
+                </div>
+            {% else %}
+                <div class="alert mb-4" style="background-color: #fef8ec; border-color: var(--ec-sandy); color: #7a5a1a;">
+                    <i class="bi bi-info-circle me-2"></i>
+                    You have not purchased this product — your review will be unverified
+                </div>
+            {% endif %}
 
-        <form method="POST">
-            {% csrf_token %}
-            <label>Rating (1-5)</label>
-            <select name="rating">
-                <option value="1">1 - Poor</option>
-                <option value="2">2 - Fair</option>
-                <option value="3">3 - Good</option>
-                <option value="4">4 - Very Good</option>
-                <option value="5" selected>5 - Excellent</option>
-            </select>
-
-            <label>Comment</label>
-            <textarea name="comment" rows="4" required></textarea>
-
-            <button type="submit">Submit Review</button>
-        </form>
-        <a href="{% url 'product_list' product.store.id %}" class="btn">Cancel</a>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Rating</label>
+                    <select name="rating" class="form-select">
+                        <option value="1">1 — Poor</option>
+                        <option value="2">2 — Fair</option>
+                        <option value="3">3 — Good</option>
+                        <option value="4">4 — Very Good</option>
+                        <option value="5" selected>5 — Excellent</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Comment</label>
+                    <textarea name="comment" class="form-control" rows="4" required></textarea>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-ec-primary">
+                        <i class="bi bi-send me-1"></i>Submit Review
+                    </button>
+                    <a href="{% url 'product_list' product.store.id %}" class="btn btn-ec-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 {% endblock %}
