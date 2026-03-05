@@ -24,7 +24,7 @@ Includes a RESTful API built with Django REST Framework.
 1. Open a terminal and clone the repository, then navigate into the project folder:
     ```
     git clone https://github.com/AnnelienJanseVanRensburg/django-ecommerce
-    cd your-repository-name
+    cd eCommerce-Web-App
     ```
 
 2. Create and activate a virtual environment:
@@ -39,6 +39,7 @@ Includes a RESTful API built with Django REST Framework.
     ```
 
 4. Create a `.env` file in the root directory with the following:
+    There is an .env.example template available
     ```
     SECRET_KEY=your-secret-key
     DEBUG=True

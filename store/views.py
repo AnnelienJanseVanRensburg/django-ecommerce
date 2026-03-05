@@ -202,6 +202,13 @@ def checkout(request):
 
     order.calculate_total()
 
+    # Mark reviews as verified for products the buyer just purchased
+    for item in OrderItem.objects.filter(order=order):
+        Review.objects.filter(
+            product=item.product,
+            reviewer=request.user,
+        ).update(is_verified=True)
+
     del request.session["cart"]
     request.session.modified = True
 
